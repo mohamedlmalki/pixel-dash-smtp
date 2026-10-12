@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import {
   Mail, Plus, ChevronDown, Send, Users, CheckCircle2, XCircle, Clock, Server, Plug, Save, Activity,
 } from "lucide-react";
+import { smtpServers, sendingLogs, type LogStatus } from "@/lib/mailforge-data";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -32,11 +33,8 @@ export const Route = createFileRoute("/")({
   component: Dashboard,
 });
 
-const servers = [
-  { name: "Office 365", status: "Ready", tone: "bg-success" },
-  { name: "Amazon SES", status: "Ready", tone: "bg-success" },
-  { name: "Mailgun EU", status: "Rate limited", tone: "bg-warning" },
-];
+const tones: Record<string, string> = { Ready: "bg-success", "Rate limited": "bg-warning" };
+const servers = smtpServers.map((s) => ({ name: s.name, status: s.status, tone: tones[s.status] ?? "bg-muted" }));
 
 const recipients = `sarah.mitchell@northwind.io
 david.chen@acmecorp.com
@@ -52,15 +50,8 @@ real-time analytics, SSO for teams, and a redesigned API.</p>
 <a href="https://example.com/q4">Read the full changelog</a>
 <p>— John Doe, Product Team</p>`;
 
-type Status = "Success" | "Failed" | "Queued";
-const logs: { email: string; status: Status; time: string; detail: string }[] = [
-  { email: "sarah.mitchell@northwind.io", status: "Success", time: "15:04:12", detail: "250 OK — queued as 8F2A1C" },
-  { email: "david.chen@acmecorp.com", status: "Success", time: "15:04:13", detail: "250 OK — queued as 8F2A1D" },
-  { email: "tom.becker@oldmail.net", status: "Failed", time: "15:04:14", detail: "550 Mailbox unavailable" },
-  { email: "lena.fischer@brightlabs.de", status: "Success", time: "15:04:15", detail: "250 OK — queued as 8F2A20" },
-  { email: "marcus.oliver@vertex.co", status: "Queued", time: "—", detail: "Waiting for slot" },
-  { email: "priya.nair@helixhealth.com", status: "Queued", time: "—", detail: "Waiting for slot" },
-];
+type Status = LogStatus;
+const logs = sendingLogs;
 
 const statusStyle: Record<Status, string> = {
   Success: "border-success/30 bg-success/10 text-success",
