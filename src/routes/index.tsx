@@ -70,7 +70,7 @@ const statusStyle: Record<Status, string> = {
 
 function Dashboard() {
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState(servers[0]);
+  const [active, setActive] = useState(servers[0]!);
 
   return (
     <div className="min-h-screen bg-background">
